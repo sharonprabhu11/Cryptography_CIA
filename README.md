@@ -18,15 +18,22 @@ Implementation of the Gronsfeld cipher with a custom polynomial hash function fo
 
 Requires Python 3.10 or later (for the `tuple[int, float]` type hint syntax). No pip installs needed.
 
+windows:
+
 ```bash
 python test_script.py
+```
+linux:
+
+```bash
+python3 test_script.py
 ```
 
 ---
 
 ## Theory: The Gronsfeld Cipher
 
-The Gronsfeld cipher is a **polyalphabetic substitution cipher** — a variant of the Vigenère cipher where the key is a sequence of digits (0–9) rather than letters.
+The Gronsfeld cipher is a **polyalphabetic substitution cipher**, a variant of the Vigenère cipher where the key is a sequence of digits (0–9) rather than letters.
 
 ### How it works
 
@@ -42,13 +49,13 @@ ciphertext[i] = (ASCII(plaintext[i]) + key_digit[i]) mod 256
 plaintext[i] = (ASCII(ciphertext[i]) - key_digit[i]) mod 256
 ```
 
-The `mod 256` operates over the full ASCII character set. This means any character — letters, digits, spaces, punctuation — can be encrypted and recovered correctly. The modulo on decryption also handles negative results: for example, `(2 - 5) mod 256 = 253`, which is a valid character rather than an error.
+The `mod 256` operates over the full ASCII character set. This means any character , letters, digits, spaces, punctuation , can be encrypted and recovered correctly. The modulo on decryption also handles negative results: for example, `(2 - 5) mod 256 = 253`, which is a valid character rather than an error.
 
 ### Key behaviour
 
 - Keys must contain only digits 0–9
 - A key digit of `0` produces no shift (ciphertext character = plaintext character)
-- A longer key increases security — more of the key is used before it repeats, making frequency analysis harder
+- A longer key increases security, more of the key is used before it repeats, making frequency analysis harder
 
 ---
 
@@ -56,7 +63,7 @@ The `mod 256` operates over the full ASCII character set. This means any charact
 
 ### Why a hash function at all?
 
-The Gronsfeld cipher provides **confidentiality** — the ciphertext is unreadable without the key. But it provides no **integrity guarantee**. If someone intercepts and modifies the ciphertext, decryption still produces output — just corrupted output, with no indication that tampering occurred.
+The Gronsfeld cipher provides **confidentiality**, the ciphertext is unreadable without the key. But it provides no **integrity guarantee**. If someone intercepts and modifies the ciphertext, decryption still produces output, just corrupted output, with no indication that tampering occurred.
 
 The hash function acts as a **fingerprint** of the original plaintext:
 
@@ -70,17 +77,17 @@ RECEIVER: decrypt(ciphertext) -> recovered
           NO  -> message was tampered with
 ```
 
-The hash is one-way — it cannot be reversed to recover the plaintext — so storing it alongside the ciphertext does not leak the original message.
+The hash is one-way , it cannot be reversed to recover the plaintext , so storing it alongside the ciphertext does not leak the original message.
 
 ### Why a polynomial hash?
 
 The polynomial hash was chosen because:
 
-1. **It can be implemented from scratch** — the algorithm is a loop of multiply-add operations with no internal tables, lookup arrays, or complex bitwise operations. Every step is mathematically explainable.
+1. **It can be implemented from scratch**, the algorithm is a loop of multiply-add operations with no internal tables, lookup arrays, or complex bitwise operations. Every step is mathematically explainable.
 
-2. **Its design decisions are derivable from first principles** — the choice of base and modulus follows from number theory (explained below), not from memorising a standard.
+2. **Its design decisions are derivable from first principles**, the choice of base and modulus follows from number theory (explained below), not from memorising a standard.
 
-3. **It satisfies the core requirements of a hash function** — deterministic, one-way, and sensitive to input changes.
+3. **It satisfies the core requirements of a hash function**, deterministic, one-way, and sensitive to input changes.
 
 ### How the polynomial hash works
 
@@ -90,7 +97,7 @@ The input string is treated as a polynomial where each character is a coefficien
 H = c[0]*base^(n-1) + c[1]*base^(n-2) + ... + c[n-1]*base^0   (mod p)
 ```
 
-This is computed using **Horner's method** — an equivalent formulation that avoids computing large powers directly:
+This is computed using **Horner's method**, an equivalent formulation that avoids computing large powers directly:
 
 ```
 H = 0
@@ -103,12 +110,12 @@ Each step folds the running hash and adds the next character's contribution. A c
 ### Parameter justification
 
 **`base = 31`**  
-A prime number. Prime bases reduce collision clustering because they share no common factors with the modulus, which improves the spread of hash values across the output space. 31 is a well-studied choice — it is the same base used in Java's `String.hashCode()`.
+A prime number. Prime bases reduce collision clustering because they share no common factors with the modulus, which improves the spread of hash values across the output space. 31 is a well-studied choice , it is the same base used in Java's `String.hashCode()`.
 
 **`mod = 2^61 - 1`**  
-This is a **Mersenne prime** — a prime of the form `2^p - 1`. Using a prime modulus ensures that hash outputs are evenly distributed across the output space (uniform distribution). The value `2^61 - 1 = 2,305,843,009,213,693,951` gives approximately `2.3 × 10^18` possible output values.
+This is a **Mersenne prime**, a prime of the form `2^p - 1`. Using a prime modulus ensures that hash outputs are evenly distributed across the output space (uniform distribution). The value `2^61 - 1 = 2,305,843,009,213,693,951` gives approximately `2.3 × 10^18` possible output values.
 
-By the birthday paradox, collisions between distinct inputs become statistically likely only after roughly `sqrt(2^61) ≈ 2^30 ≈ 1 billion` inputs — far beyond any realistic use in this context.
+By the birthday paradox, collisions between distinct inputs become statistically likely only after roughly `sqrt(2^61) ≈ 2^30 ≈ 1 billion` inputs , far beyond any realistic use in this context.
 
 ### Known limitation
 
@@ -118,7 +125,7 @@ The avalanche effect is **position-dependent**: a change at the start of the str
 
 ## Worked Examples
 
-### Example 1 — From the paper (UNIVERSITY / key 123456)
+### Example 1 , From the paper (UNIVERSITY / key 123456)
 
 | Step | Value |
 |---|---|
@@ -143,7 +150,7 @@ C[2] = (ASCII('I') + 3) mod 256 = (73 + 3) mod 256 = 76 = 'L'
 
 ---
 
-### Example 2 — Mixed characters (Hello, World! / key 9031)
+### Example 2 , Mixed characters (Hello, World! / key 9031)
 
 | Step | Value |
 |---|---|
@@ -170,8 +177,8 @@ C[2] = (ASCII('l') + 3) mod 256 = (108 + 3) mod 256 = 111 = 'o'
 
 ### Why split into three files?
 
-- `gronsfeld.py` and `polynomial_hash.py` are **separate concerns** — encryption is about confidentiality, hashing is about integrity. Mixing them in one file would misrepresent what each layer does.
-- `test_script.py` imports from both, representing the **pipeline** layer — where the two components are connected.
+- `gronsfeld.py` and `polynomial_hash.py` are **separate concerns** , encryption is about confidentiality, hashing is about integrity. Mixing them in one file would misrepresent what each layer does.
+- `test_script.py` imports from both, representing the **pipeline** layer , where the two components are connected.
 
 ### Why `mod 256` for the cipher?
 
@@ -179,4 +186,4 @@ Using `mod 256` operates over the full extended ASCII range rather than just the
 
 ### Why return hex from the hash?
 
-Hexadecimal gives a compact, consistent string representation of the integer hash value — conventional for cryptographic output and easy to store or compare as a string.
+Hexadecimal gives a compact, consistent string representation of the integer hash value, conventional for cryptographic output and easy to store or compare as a string.

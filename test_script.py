@@ -34,7 +34,7 @@ def show_round_trip(label: str, plaintext: str, key: str):
     print(f"      polynomial_hash -> {original_hash}")
 
     # Step 2: Encrypt
-    ciphertext = encrypt(plaintext, key)
+    ciphertext = encrypt(plaintext, key) 
     print(f"\n  [2] Encrypt")
     print(f"      Ciphertext -> {ciphertext!r}")
     print(f"      ASCII vals -> {[ord(c) for c in ciphertext]}")
@@ -68,11 +68,9 @@ show_round_trip(
     key       = "9031"
 )
 
-# =============================================================================
 # TAMPERING SIMULATION
 # Shows the hash catching a modification to the ciphertext.
 # Without hashing, the receiver would get a corrupted message with no warning.
-# =============================================================================
 
 separator("TAMPERING SIMULATION")
 
